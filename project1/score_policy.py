@@ -6,6 +6,8 @@ from data_utils import load_data
 import numpy as np
 import argparse
 
+from numpngw import write_apng
+
 
 def test_model(policy, n_test=20, gui_enable=False, img_obs=False):
     success = 0
@@ -15,6 +17,9 @@ def test_model(policy, n_test=20, gui_enable=False, img_obs=False):
 
     max_dists = np.linalg.norm(goal - init_pos)
     min_dists = []
+
+    images = []
+
     for _ in range(n_test):
         # env = SimpleMaze(gui_enabled=gui_enable, img_obs=img_obs)
         env = SimpleMaze(img_obs=img_obs)
@@ -26,6 +31,11 @@ def test_model(policy, n_test=20, gui_enable=False, img_obs=False):
             act = policy.get_actions(obs)[0]
             obs, _, done, info = env.step(act)
             positions.append(info['agent_pos'])
+
+            if gui_enable:
+                img = env.render()
+                images.append(img)
+
             if done:
                 success += 1
                 break
@@ -60,13 +70,15 @@ def test_model(policy, n_test=20, gui_enable=False, img_obs=False):
             score = 3
         else:
             score = 0
-    return success_rate, mean_min_dist, score
+    return success_rate, mean_min_dist, score, images
 
 
 def score_position_bc(policy, gui_enable=False):
     data = load_data('./data/bc_with_gtpos_data.pkl')
     policy.train(data)
     _, _, score = test_model(policy, n_test=20, gui_enable=gui_enable, img_obs=False)
+    if gui_enable:
+        write_apng('pos_bc_anim.png', images, delay=40)
     return score
 
 
@@ -74,6 +86,8 @@ def score_img_bc(policy, gui_enable=False):
     data = load_data('./data/bc_data.pkl')
     policy.train(data)
     _, _, score = test_model(policy, n_test=20,  gui_enable=gui_enable, img_obs=True)
+    if gui_enable:
+        write_apng('rgb_bc_anim.png', images, delay=40)
     return score
 
 
@@ -117,11 +131,14 @@ def score_regressor(regressor):
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gui', dest='gui_enable', action='store_true')
+    parser.add_argument('--gui', dest='gui_enable', choices=[True, False], default=False)
+    parser.add_argument('pos_bc_robot')
+    parser.add_argument('rgb_bc_robot')
+    parser.add_argument('position_regressor')
     args = parser.parse_args()
-    score_pos = score_position_bc(gui_enable=args.gui_enable)
-    score_img = score_img_bc(gui_enable=args.gui_enable)
-    score_reg = score_regressor()
+    score_pos = score_position_bc(policy=args.pos_bc_robot, gui_enable=args.gui_enable)
+    score_img = score_img_bc(policy=args.rgb_bc_robot, gui_enable=args.gui_enable)
+    score_reg = score_regressor(regressor=args.position_regressor)
     final_score = np.sum([score_pos, score_img, score_reg])
     print('\n\n\n--------SCORES--------')
     print(f'Position regression: {score_reg}/5')
