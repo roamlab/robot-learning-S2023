@@ -129,16 +129,10 @@ def score_regressor(regressor):
     return score
 
 
-if __name__ == '__main__' :
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--gui', dest='gui_enable', choices=[True, False], default=False)
-    parser.add_argument('pos_bc_robot')
-    parser.add_argument('rgb_bc_robot')
-    parser.add_argument('position_regressor')
-    args = parser.parse_args()
-    score_pos = score_position_bc(policy=args.pos_bc_robot, gui_enable=args.gui_enable)
-    score_img = score_img_bc(policy=args.rgb_bc_robot, gui_enable=args.gui_enable)
-    score_reg = score_regressor(regressor=args.position_regressor)
+def score_all_parts(pos_bc_robot, rgb_bc_robot, pos_regressor, gui_enable=False):
+    score_pos = score_position_bc(policy=pos_bc_robot, gui_enable=gui_enable)
+    score_img = score_img_bc(policy=rgb_bc_robot, gui_enable=gui_enable)
+    score_reg = score_regressor(regressor=pos_regressor)
     final_score = np.sum([score_pos, score_img, score_reg])
     print('\n\n\n--------SCORES--------')
     print(f'Position regression: {score_reg}/5')
