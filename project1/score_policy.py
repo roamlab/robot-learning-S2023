@@ -76,7 +76,7 @@ def test_model(policy, n_test=20, gui_enable=False, img_obs=False):
 def score_position_bc(policy, gui_enable=False):
     data = load_data('./data/bc_with_gtpos_data.pkl')
     policy.train(data)
-    _, _, score = test_model(policy, n_test=20, gui_enable=gui_enable, img_obs=False)
+    _, _, score, images = test_model(policy, n_test=20, gui_enable=gui_enable, img_obs=False)
     if gui_enable:
         write_apng('pos_bc_anim.png', images, delay=40)
     return score
@@ -85,7 +85,7 @@ def score_position_bc(policy, gui_enable=False):
 def score_img_bc(policy, gui_enable=False):
     data = load_data('./data/bc_data.pkl')
     policy.train(data)
-    _, _, score = test_model(policy, n_test=20,  gui_enable=gui_enable, img_obs=True)
+    _, _, score, images = test_model(policy, n_test=20,  gui_enable=gui_enable, img_obs=True)
     if gui_enable:
         write_apng('rgb_bc_anim.png', images, delay=40)
     return score
