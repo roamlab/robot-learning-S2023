@@ -69,7 +69,11 @@ class SimpleMaze(gym.Env):
             self._physics_client = p.connect(p.GUI)  # graphical version
         else:
             self._physics_client = p.connect(p.DIRECT)  # non-graphical version
+
+        self.render_mode = 'rgb_array'
+        self.rgb_img = None
         self.reset()
+
 
     def _load_goal(self, goal_info):
         size = goal_info['size']
@@ -141,7 +145,7 @@ class SimpleMaze(gym.Env):
     def reset(self):
         global IDX
         p.resetSimulation()
-        body_ids = p.loadMJCF('mjcf/point_mass.xml')
+        body_ids = p.loadMJCF('./robot-learning-S2023/project1/mjcf/point_mass.xml')
         self._world_id = 0
         self._goal_body_id = None
 
@@ -167,9 +171,10 @@ class SimpleMaze(gym.Env):
         if self._goal_body_id is not None:
             p.removeBody(self._goal_body_id)
         self._load_goal(dict_copy)
-        rgb_img = self._get_top_view()
+        # rgb_img = self._get_top_view()
+        self.rgb_img = self._get_top_view()  # added this in colab version
         if self.img_obs:
-            obs = rgb_img
+            obs = self.rgb_img
         else:
             obs = p.getLinkState(self._world_id, 1)[4][:2]
         return obs
@@ -211,12 +216,16 @@ class SimpleMaze(gym.Env):
             'obstacle_infos': OBSTACLE_INFO,
             'goal': self.goal_pos,
         }
-        rgb_img = self._get_top_view()
+        # rgb_img = self._get_top_view()
+        self.rgb_img = self._get_top_view()
         if self.img_obs:
-            obs = rgb_img
+            obs = self.rgb_img
         else:
             obs = pos
         return obs, 0, done, info
+
+    def render(self):
+        return self.rgb_img
 
     # Step through simulation time
     def step_simulation(self):

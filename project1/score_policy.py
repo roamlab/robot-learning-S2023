@@ -16,7 +16,8 @@ def test_model(policy, n_test=20, gui_enable=False, img_obs=False):
     max_dists = np.linalg.norm(goal - init_pos)
     min_dists = []
     for _ in range(n_test):
-        env = SimpleMaze(gui_enabled=gui_enable, img_obs=img_obs)
+        # env = SimpleMaze(gui_enabled=gui_enable, img_obs=img_obs)
+        env = SimpleMaze(img_obs=img_obs)
         obs = env.reset()
         done = False
         positions = []
@@ -62,27 +63,21 @@ def test_model(policy, n_test=20, gui_enable=False, img_obs=False):
     return success_rate, mean_min_dist, score
 
 
-def score_position_bc(gui_enable=False):
-    from solutions.pos_bc_robot import POSBCRobot
-    policy = POSBCRobot()
+def score_position_bc(policy, gui_enable=False):
     data = load_data('./data/bc_with_gtpos_data.pkl')
     policy.train(data)
     _, _, score = test_model(policy, n_test=20, gui_enable=gui_enable, img_obs=False)
     return score
 
 
-def score_img_bc(gui_enable=False):
-    from solutions.rgb_bc_robot import RGBBCRobot
-    policy = RGBBCRobot()
+def score_img_bc(policy, gui_enable=False):
     data = load_data('./data/bc_data.pkl')
     policy.train(data)
     _, _, score = test_model(policy, n_test=20,  gui_enable=gui_enable, img_obs=True)
     return score
 
 
-def score_regressor():
-    from solutions.pos_regressor import PositionRegressor
-    regressor = PositionRegressor()
+def score_regressor(regressor):
     data = load_data('./data/regression_data.pkl')
     regressor.train(data)
     positions = np.asarray([info['agent_pos'] for info in data['info']])
