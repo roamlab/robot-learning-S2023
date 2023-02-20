@@ -1,0 +1,2 @@
+project2/data/all_maps.pkl filter=lfs diff=lfs merge=lfs -text
+project2/data/map1.pkl filter=lfs diff=lfs merge=lfs -text
