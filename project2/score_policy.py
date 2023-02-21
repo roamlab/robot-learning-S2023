@@ -27,7 +27,8 @@ def test_model(policy, n_test, obs_type, maps, gui=False):
             agent_poses.append(info['agent'])
 
             if gui:
-              img = env.render()
+              img = info['rgb']
+              img = (img * 255).astype(np.uint8)
               imgs.append(img)
 
             if done:

@@ -311,6 +311,3 @@ class SimpleMaze(gym.Env):
 
     def close(self):
         p.disconnect()
-
-    def render(self):
-        return self.np_randomobs['rgb']
