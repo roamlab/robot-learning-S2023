@@ -27,7 +27,9 @@ class MyDNN(nn.Module):
         return x
 	
     def predict(self, features):
-	""" Function receives a numpy array, converts to torch, returns numpy again"""
+        """ 
+        Function receives a numpy array, converts to torch, returns numpy again
+        """
         self.eval()	#Sets network in eval mode (vs training mode)
         features = torch.from_numpy(features).float()
         return self.forward(features).detach().numpy()
@@ -74,7 +76,7 @@ class MyDNNTrain(object):
             loss.backward()
             total_loss += loss.item()
             self.optimizer.step()
-        print 'loss', total_loss/i
+        print('loss', total_loss/i)
 
 def function(x1, x2):
     return math.cos(x1) * math.cos(x2)
